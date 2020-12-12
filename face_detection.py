@@ -4,6 +4,7 @@
 
 import cv2 as cv
 import argparse
+import numpy as np
 import sys
 import os
 from source.utils import draw_rectangle
@@ -12,7 +13,6 @@ from source.utils import draw_rectangle
 
 def recognize_faces(frame):
     faces_list = []
-    min_detection_confidence = 20
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     gray = cv.equalizeHist(gray)
     faceCascade = cv.CascadeClassifier(args.path)
@@ -25,8 +25,16 @@ def recognize_faces(frame):
     )
 
     for (x, y, w, h) in faces:
-        cv.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
-    return frame
+        start_x = x
+        end_x = x+w
+        start_y = y
+        end_y = y + h
+        face_dict = {}
+        face_dict['rect'] = [start_x, start_y, end_x, end_y]
+        face_dict['face'] = frame[start_y:end_y, start_x:end_x, :]
+        faces_list.append(face_dict)
+
+    return faces_list
 
 
 def capture():
@@ -41,7 +49,9 @@ def capture():
             print('--(!) No captured frame -- Break!')
             break
         #cv.imshow("Display window", frame)
-        frame=recognize_faces(frame)
+        faces=recognize_faces(frame)
+        for face in faces:
+            frame=draw_rectangle(frame, face)
         cv.imshow("Detected window", frame)
         if cv.waitKey(10) == 27:  # esc to exit
             break

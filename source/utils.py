@@ -13,7 +13,7 @@ def draw_rectangle(image, face):
                   thickness=2)
 
     # Draw detection probability, if it is present
-    if (face["recognition_prob"] != []):
+    '''if (face["recognition_prob"] != []):
         # Create probability text to be drawn over image
         text = "{}: {:.2f}%".format(face["name"], face["recognition_prob"])
         # Arrange location of the probability text to be drawn over image
@@ -27,5 +27,5 @@ def draw_rectangle(image, face):
                     fontFace=cv.FONT_HERSHEY_SIMPLEX,
                     fontScale=0.45,
                     color=probability_color_rgb,
-                    thickness=1)
+                    thickness=1)'''
     return image

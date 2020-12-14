@@ -10,6 +10,33 @@ import os
 from source.utils import draw_rectangle
 
 
+def detect_and_predict_face(frame, faceNet):
+    (h, w) = frame.shape[:2]
+    blob = cv.dnn.blobFromImage(frame, 1.0, (224, 224),(104.0, 177.0, 123.0))
+
+    faceNet.setInput(blob)
+    detections = faceNet.forward()
+    #print(detections.shape)
+    faces_list = []
+    for i in range(0, detections.shape[2]):
+        confidence = detections[0, 0, i, 2]
+
+        if confidence > 0.5:
+            box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+            (startX, startY, endX, endY) = box.astype("int")
+
+            (startX, startY) = (max(0, startX), max(0, startY))
+            (endX, endY) = (min(w - 1, endX), min(h - 1, endY))
+
+            face = frame[startY:endY, startX:endX]
+            face = cv.cvtColor(face, cv.COLOR_BGR2RGB)
+            face = cv.resize(face, (224, 224))
+            face_dict = {}
+            face_dict['rect'] = [startX, startY, endX, endY]
+            face_dict['face'] = frame[startY:endY, startX:endX, :]
+            faces_list.append(face_dict)
+    return faces_list
+
 
 def recognize_faces(frame,args):
     faces_list = []
@@ -26,16 +53,14 @@ def recognize_faces(frame,args):
 
     for (x, y, w, h) in faces:
         start_x = x
-        if (start_x - int(w * 0.1) > 0): start_x = start_x - int(w * 0.1)
         end_x = x+w
-        if (end_x + int(w * 0.1) < frame.shape[1]): end_x = end_x + int(w * 0.1)
         start_y = y
-        if (start_y - int(h * 0.1) > 0): start_y = start_y - int(h * 0.1)
         end_y = y + h
-        if (end_y + int(h * 0.1) < frame.shape[0]): end_y = end_y + int(h * 0.1)
         face_dict = {}
         face_dict['rect'] = [start_x, start_y, end_x, end_y]
-        face_dict['face'] = frame[start_y:end_y, start_x:end_x, :]
+        face = frame[start_y:end_y, start_x:end_x, :]
+        face = cv.resize(face, (224, 224))
+        face_dict['face'] = face
         faces_list.append(face_dict)
 
     return faces_list

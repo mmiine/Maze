@@ -11,7 +11,7 @@ from source.utils import draw_rectangle
 
 
 
-def recognize_faces(frame):
+def recognize_faces(frame,args):
     faces_list = []
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
     gray = cv.equalizeHist(gray)
@@ -26,9 +26,13 @@ def recognize_faces(frame):
 
     for (x, y, w, h) in faces:
         start_x = x
+        if (start_x - int(w * 0.1) > 0): start_x = start_x - int(w * 0.1)
         end_x = x+w
+        if (end_x + int(w * 0.1) < frame.shape[1]): end_x = end_x + int(w * 0.1)
         start_y = y
+        if (start_y - int(h * 0.1) > 0): start_y = start_y - int(h * 0.1)
         end_y = y + h
+        if (end_y + int(h * 0.1) < frame.shape[0]): end_y = end_y + int(h * 0.1)
         face_dict = {}
         face_dict['rect'] = [start_x, start_y, end_x, end_y]
         face_dict['face'] = frame[start_y:end_y, start_x:end_x, :]
@@ -37,7 +41,7 @@ def recognize_faces(frame):
     return faces_list
 
 
-def capture():
+def capture(args):
     camera_device = args.camera
     cap = cv.VideoCapture(camera_device)
     if not cap.isOpened:
@@ -58,13 +62,13 @@ def capture():
 
 
 
-def __main__():
-    capture()
+def __main__(args):
+    capture(args)
 
-parser = argparse.ArgumentParser(description='face detection with cascade')
-parser.add_argument('--path', help='face detection method path',default='source/haarcascade_frontalface_default.xml')
-parser.add_argument('--camera', help='Camera divide number.', type=int, default=0)
-args = parser.parse_args()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='face detection with cascade')
+    parser.add_argument('--path', help='face detection method path',default='source/haarcascade_frontalface_default.xml')
+    parser.add_argument('--camera', help='Camera divide number.', type=int, default=0)
+    args = parser.parse_args()
 
-__main__()
-
+    __main__()

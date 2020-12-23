@@ -10,7 +10,7 @@ import os
 from source.utils import draw_rectangle
 from numba import vectorize
 
-@vectorize( target='cuda')
+
 def detect_and_predict_face(frame, faceNet):
     (h, w) = frame.shape[:2]
     blob = cv.dnn.blobFromImage(frame, 1.0, (224, 224),(104.0, 177.0, 123.0))

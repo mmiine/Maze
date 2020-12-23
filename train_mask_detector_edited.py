@@ -30,7 +30,7 @@ INIT_LR = 1e-4
 EPOCHS = 20
 BS = 32
 
-DIRECTORY = r"C:\Users\MMine\Documents\Face-Mask-Detection\dataset"  #bilgisayarınızda datasetin bulunduğu directoryi yazın
+DIRECTORY = r"D:\Documents\data\FaceMaske Dedection\FaceMaske Dedection\cropped"  #bilgisayarınızda datasetin bulunduğu directoryi yazın
 CATEGORIES = [ "with_mask","with_improper_mask","without_mask"]
 
 

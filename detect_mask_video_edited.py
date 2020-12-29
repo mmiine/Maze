@@ -11,7 +11,7 @@ import os
 import time
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-maskNet1 = load_model("mask_detector_edited.model")
+maskNet1 = load_model("mask_detector_1000.model")
 
 
 def detect_and_predict_mask(frame, faceNet):

@@ -22,16 +22,23 @@ import os
 import time
 import tensorflow as tf
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+SEED=1
+os.environ['PYTHONHASHSEED']=str(SEED)
+os.environ['TF_CUDNN_DETERMINISTIC'] = '1'  # new flag present in tf 2.0+
+np.random.seed(SEED)
+tf.random.uniform([1], seed=SEED)
+
 
 # initialize the initial learning rate, number of epochs to train for,
 # and batch size
 INIT_LR = 1e-4
-EPOCHS = 20
-BS = 32
+EPOCHS = 30
+BS = 25
 
-DIRECTORY = r"D:\Documents\data\FaceMaske Dedection\FaceMaske Dedection\cropped"  #bilgisayarınızda datasetin bulunduğu directoryi yazın
-CATEGORIES = [ "with_mask","with_improper_mask","without_mask"]
+DIRECTORY = r"D:\Users\finalised-data"  #bilgisayarınızda datasetin bulunduğu directoryi yazın
+CATEGORIES = [ "proper-mask","improper-mask","non-mask"]
 
 
 # grab the list of images in our dataset directory, then initialize
@@ -59,6 +66,8 @@ lb = LabelBinarizer()
 labels = lb.fit_transform(labels)
 #labels = to_categorical(labels)
 
+
+
 data = np.array(data, dtype="float32")
 labels = np.array(labels)
 D2labels=labels
@@ -66,7 +75,6 @@ start = time.time()
 (trainX, testX, trainY, testY) = train_test_split(data, D2labels,
 	test_size=0.20, stratify=D2labels, random_state=42)
 
-# construct the training image generator for data augmentation
 aug = ImageDataGenerator(
 	rotation_range=20,
 	zoom_range=0.15,
@@ -127,7 +135,8 @@ print(classification_report(testY.argmax(axis=1), predIdxs,
 
 # serialize the model to disk
 print("[INFO] saving mask detector model...")
-model.save("mask_detector_edited.model", save_format="h5")
+model.save("mask_detector_1000_30.model", save_format="h5")
+
 
 print("Time taken in seconds: ", finish-start)
 # plot the training loss and accuracy
@@ -142,4 +151,4 @@ plt.title("Training Loss and Accuracy")
 plt.xlabel("Epoch #")
 plt.ylabel("Loss/Accuracy")
 plt.legend(loc="lower left")
-plt.savefig("plot_edited.png")
+plt.savefig("plot_1000_30.png")

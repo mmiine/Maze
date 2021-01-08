@@ -5,13 +5,13 @@ from tensorflow.keras.models import load_model
 from imutils.video import VideoStream
 import numpy as np
 import imutils
-import time
 import cv2
 import os
 import time
+
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-maskNet1 = load_model("mask_detector_1000.model")
+maskNet1 = load_model("mask_detector.model")
 
 
 def detect_and_predict_mask(frame, faceNet):

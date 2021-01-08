@@ -15,29 +15,25 @@ from tensorflow.keras.utils import to_categorical
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
 from imutils import paths
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 import time
-import tensorflow as tf
 
-#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-SEED=1
-os.environ['PYTHONHASHSEED']=str(SEED)
-os.environ['TF_CUDNN_DETERMINISTIC'] = '1'  # new flag present in tf 2.0+
-np.random.seed(SEED)
-tf.random.uniform([1], seed=SEED)
-
+#uncomment if CUDA makes problems
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 # initialize the initial learning rate, number of epochs to train for,
 # and batch size
 INIT_LR = 1e-4
-EPOCHS = 30
+EPOCHS = 20
 BS = 25
 
-DIRECTORY = r"D:\Users\finalised-data"  #bilgisayarınızda datasetin bulunduğu directoryi yazın
+DIRECTORY = r"D:\Users\train"  #bilgisayarınızda datasetin bulunduğu directoryi yazın
+TEST_DIRECTORY = r"D:\\Users\\test" #wite your own test directory
 CATEGORIES = [ "proper-mask","improper-mask","non-mask"]
 
 
@@ -45,6 +41,7 @@ CATEGORIES = [ "proper-mask","improper-mask","non-mask"]
 # the list of data (i.e., images) and class images
 print("[INFO] loading images...")
 
+#import train images
 data = []
 labels = []
 
@@ -61,19 +58,18 @@ for category in CATEGORIES:
 		labels.append(category)
 
 # perform one-hot encoding on the labels
-print("[INFO] Images Loaded.")
 lb = LabelBinarizer()
 labels = lb.fit_transform(labels)
 #labels = to_categorical(labels)
 
+print("[INFO] Images Loaded.")
 
 
 data = np.array(data, dtype="float32")
 labels = np.array(labels)
 D2labels=labels
 start = time.time()
-(trainX, testX, trainY, testY) = train_test_split(data, D2labels,
-	test_size=0.20, stratify=D2labels, random_state=42)
+(trainX, validationX, trainY, validationY) = train_test_split(data, D2labels, test_size=0.20, stratify=D2labels, random_state=55)
 
 aug = ImageDataGenerator(
 	rotation_range=20,
@@ -117,25 +113,51 @@ print("[INFO] training head...")
 H = model.fit(
 	aug.flow(trainX, trainY, batch_size=BS),
 	steps_per_epoch=len(trainX) // BS,
-	validation_data=(testX, testY),
-	validation_steps=len(testX) // BS,
+	validation_data=(validationX, validationY),
+	validation_steps=len(validationX) // BS,
 	epochs=EPOCHS)
 
+finish = time.time()
 # make predictions on the testing set
 print("[INFO] evaluating network...")
-predIdxs = model.predict(testX, batch_size=BS)
+
+#import test images
+data1 = []
+labels1 = []
+for category in CATEGORIES:
+	path = os.path.join(TEST_DIRECTORY, category)
+	for img in os.listdir(path):
+		img_path = os.path.join(path, img)
+		#print(img_path)
+		image = load_img(img_path, target_size=(224, 224))
+		image = img_to_array(image)
+		image = preprocess_input(image)
+		data1.append(image)
+		labels1.append(category)
+
+labels1 = lb.fit_transform(labels1)
+labels1 = np.array(labels1)
+
+test = np.array(data1)
+predictions = model.predict(test)
+pred_labels = list(np.argmax(predictions, axis=-1))
+true_labels = list(np.argmax(labels1, axis=-1))
+
+cm = confusion_matrix(true_labels, pred_labels)
+print("Confusion Matrix\nClasses = ",lb.classes_)
+print(cm)
+print(classification_report(true_labels,pred_labels,target_names=lb.classes_))
+
 
 # for each image in the testing set we need to find the index of the
 # label with corresponding largest predicted probability
-predIdxs = np.argmax(predIdxs, axis=1)
-finish = time.time()
+
+
 # show a nicely formatted classification report
-print(classification_report(testY.argmax(axis=1), predIdxs,
-	target_names=lb.classes_))
 
 # serialize the model to disk
 print("[INFO] saving mask detector model...")
-model.save("mask_detector_1000_30.model", save_format="h5")
+model.save("mask_detector.model", save_format="h5")
 
 
 print("Time taken in seconds: ", finish-start)
@@ -151,4 +173,5 @@ plt.title("Training Loss and Accuracy")
 plt.xlabel("Epoch #")
 plt.ylabel("Loss/Accuracy")
 plt.legend(loc="lower left")
-plt.savefig("plot_1000_30.png")
+plt.savefig("plot_epoch_vs_accuracy.png")
+

@@ -2,3 +2,5 @@ opencv-python
 numpy
 matplotlib
 imutils
+tensorflow-gpu==2.4
+sklearn

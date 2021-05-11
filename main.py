@@ -1,5 +1,8 @@
-from face_detector.mask_detector import detection
 import os
+
+from face_detector.mask_detector import detection
+from sensor.DDSubsytem import DecisionDetection
+
 
 
 
@@ -40,4 +43,7 @@ class _consts:
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
+
+
 detection(_consts)
+DecisionDetection(_consts)

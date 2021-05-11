@@ -3,10 +3,10 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 from imutils.video import VideoStream
-import numpy as np
+from numpy import array
 import imutils
 
-from time import time,sleep
+from time import time
 
 from cv2.dnn import readNet,blobFromImage
 from cv2 import cvtColor,COLOR_BGR2RGB,resize,putText,FONT_HERSHEY_SIMPLEX,rectangle
@@ -32,7 +32,7 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 
 		if confidence > 0.5:
 
-			box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
+			box = detections[0, 0, i, 3:7] * array([w, h, w, h])
 			(startX, startY, endX, endY) = box.astype("int")
 
 
@@ -52,7 +52,7 @@ def detect_and_predict_mask(frame, faceNet, maskNet):
 
 	if len(faces) > 0:
 
-		faces = np.array(faces, dtype="float32")
+		faces = array(faces, dtype="float32")
 		preds = maskNet.predict(faces, batch_size=32)
 
 	return (locs, preds)

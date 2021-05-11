@@ -4,3 +4,5 @@ matplotlib
 imutils
 tensorflow-gpu==2.4
 sklearn
+board
+adafruit_mlx90614

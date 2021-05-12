@@ -1,8 +1,9 @@
 import os
 from multiprocessing import Process
+from cv2 import waitKey, destroyAllWindows
 
-from face_detector.mask_detector import detection
-#from sensor.DDSubsytem import DecisionDetection
+from face_detector.mask_detector import detection, detectionLoop
+from sensor.DDSubsytem import DecisionDetection , DDLoop
 
 
 
@@ -46,5 +47,18 @@ class _consts:
 
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-    Process(target=detection, args=(_consts,)).start()
-    #DecisionDetection(_consts)
+    vs, faceNet, maskNet =detection(_consts)
+    DDTuple = DecisionDetection(_consts)
+    while True:
+        label = detectionLoop(vs, faceNet, maskNet)
+        if label == "Proper Mask":
+            print("\n",label,"\n")
+        crowd = DDLoop(DDTuple, crowd, label)
+
+        key = waitKey(1) & 0xFF
+        if key == ord("q"):
+            break
+    destroyAllWindows()
+    vs.stop()
+
+#Process(target=, args=(_consts,)).start()

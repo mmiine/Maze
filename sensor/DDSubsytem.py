@@ -109,5 +109,4 @@ def DecisionDetection(_consts):
     a = 0
     crowd = 0
     DDTuple = (TRIGIN, TRIGOUT, ECHOIN, ECHOOUT, mlx, _consts )
-    while True:
-        crowd = DDLoop(DDTuple, crowd, "Proper Mask")
+    return DDTuple

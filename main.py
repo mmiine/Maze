@@ -36,9 +36,9 @@ class _consts:
         '''
         Paths
         '''
-        maskNet = r"face_detector\mask_detector.model"
-        prototxtPath = r"face_detector\deploy.prototxt"
-        weightsPath = r"face_detector\res10_300x300_ssd_iter_140000.caffemodel"
+        maskNet = r"mask_detector.model"
+        prototxtPath = r"deploy.prototxt"
+        weightsPath = r"res10_300x300_ssd_iter_140000.caffemodel"
 
 
 

@@ -66,56 +66,60 @@ def detection(_consts):
 	vs = VideoStream(src=0).start()
 
 	while True:
-		frame = vs.read()
-		frame = imutils.resize(frame, width=400)
-		start = time()
-		# detect faces in the frame and determine if they are wearing a
-		# face mask or not
-		(locs, preds) = detect_and_predict_mask(frame, faceNet,maskNet)
-		label = " "
-		# loop over the detected face locations and their corresponding
-		# locations
-		for (box, pred) in zip(locs, preds):
-			# unpack the bounding box and predictions
-			(startX, startY, endX, endY) = box
-			(improperMask,withoutMask, mask) = pred
-			print("proper: ", mask," improper: ", improperMask," non: ",withoutMask)
-			if (mask > withoutMask and mask > improperMask):  # predicted as masked
-				# proper improper comparison
-				label = "Proper Mask"
-				color = (0, 255, 0) if label == "Proper Mask" else (0, 255, 0)
 
-			elif(improperMask > withoutMask and improperMask > mask):  # predicted as unmasked
-				# improper unmasked comparison
-				label = "Improper Mask"
-				color = (255, 255, 0)
-
-			elif (withoutMask > improperMask and withoutMask > mask):  # predicted as unmasked
-				# improper unmasked comparison
-				label = "Non Mask"
-				color = (0, 0, 255)
-
-
-			# include the probability in the label
-			label = "{}: {:.2f}%".format(label, max(mask, improperMask ,withoutMask) * 100)
-
-			# display the label and bounding box rectangle on the output
-			# frame
-			putText(frame, label, (startX, startY - 10),
-				FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
-			rectangle(frame, (startX, startY), (endX, endY), color, 2)
-		end = time()
-		# show the output frame
-		imshow("Frame", frame)
-
-		key = waitKey(1) & 0xFF
-
-		print("Latency in miliseconds: ",(end-start)*1000)
-
+		detectionLoop(vs, faceNet, maskNet)
 		# if the `q` key was pressed, break from the loop
+		key = waitKey(1) & 0xFF
 		if key == ord("q"):
 			break
 
 	# do a bit of cleanup
 	destroyAllWindows()
 	vs.stop()
+
+
+def detectionLoop(vs, faceNet, maskNet):
+	frame = vs.read()
+	frame = imutils.resize(frame, width=400)
+	start = time()
+	# detect faces in the frame and determine if they are wearing a
+	# face mask or not
+	(locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
+	label = " "
+	# loop over the detected face locations and their corresponding
+	# locations
+	for (box, pred) in zip(locs, preds):
+		# unpack the bounding box and predictions
+		(startX, startY, endX, endY) = box
+		(improperMask, withoutMask, mask) = pred
+		print("proper: ", mask, " improper: ", improperMask, " non: ", withoutMask)
+		if (mask > withoutMask and mask > improperMask):  # predicted as masked
+			# proper improper comparison
+			label = "Proper Mask"
+			color = (0, 255, 0) if label == "Proper Mask" else (0, 255, 0)
+
+		elif (improperMask > withoutMask and improperMask > mask):  # predicted as unmasked
+			# improper unmasked comparison
+			label = "Improper Mask"
+			color = (255, 255, 0)
+
+		elif (withoutMask > improperMask and withoutMask > mask):  # predicted as unmasked
+			# improper unmasked comparison
+			label = "Non Mask"
+			color = (0, 0, 255)
+
+		# include the probability in the label
+		label = "{}: {:.2f}%".format(label, max(mask, improperMask, withoutMask) * 100)
+
+		# display the label and bounding box rectangle on the output
+		# frame
+		putText(frame, label, (startX, startY - 10),
+				FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
+		rectangle(frame, (startX, startY), (endX, endY), color, 2)
+	end = time()
+	# show the output frame
+	imshow("Frame", frame)
+
+	print("Latency in miliseconds: ", (end - start) * 1000)
+
+	return label

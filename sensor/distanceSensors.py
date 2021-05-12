@@ -1,7 +1,8 @@
 from time import time, sleep
 import RPi.GPIO as GPIO
 
-def servoControl(angle,SERVOPIN,pwm):
+
+def servoControl(angle, SERVOPIN, pwm):
     duty = angle / 18 + 3
     GPIO.output(SERVOPIN, True)
     pwm.ChangeDutyCycle(duty)
@@ -9,8 +10,10 @@ def servoControl(angle,SERVOPIN,pwm):
     GPIO.output(SERVOPIN, False)
 
 
-def controlSensor(TRIGCHK, ECHOCHK):
-
+def controlSensor(_consts ):
+    TRIGCHK = _consts.pin.TRIGCHK
+    ECHOCHK = _consts.pin.ECHOCHK
+    waitingTime = _consts.pre.waitingTime
     pulse_end= 0
     pulse_start =0
 
@@ -42,6 +45,7 @@ def controlSensor(TRIGCHK, ECHOCHK):
     print("No one passed!")
     return False
 
+
 def PeopleCounting(crowd,_consts, exit=0 ,enter=0):
     servoOpenAngle = _consts.pre.servoOpenAngle
     servoCloseAngle =_consts.pre.servoCloseAngle
@@ -62,7 +66,7 @@ def PeopleCounting(crowd,_consts, exit=0 ,enter=0):
             print("EXITING PROCESSING")
             servoControl(servoOpenAngle,SERVOPIN,pwm)
             sleep(0.001)
-            CONTROL = controlSensor()
+            CONTROL = controlSensor(_consts)
             if CONTROL:
                 crowd = crowd - 1
             sleep(1)
@@ -78,7 +82,7 @@ def PeopleCounting(crowd,_consts, exit=0 ,enter=0):
         else:
             print("ENTERING PROCESSING")
             servoControl(servoOpenAngle,SERVOPIN,pwm)
-            CONTROL = controlSensor()
+            CONTROL = controlSensor(_consts)
             if CONTROL:
                 crowd = crowd + 1
             sleep(1)

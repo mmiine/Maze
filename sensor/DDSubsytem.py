@@ -8,6 +8,68 @@ from distanceSensors import PeopleCounting
 from temperatureSensor import temperatureCalibration
 
 
+def DDLoop(DDTuple,crowd,maskpos):
+    TRIGIN, TRIGOUT,ECHOIN,ECHOOUT,mlx,_consts = DDTuple
+    sleep(0.0001)
+    print("PEOPLE INSIDE BUILDING = ", str(crowd), "\nWAITING MODE")
+    ## OUT DISTANCE SENSOR
+    GPIO.output(TRIGOUT, True)
+    sleep(0.0001)
+    GPIO.output(TRIGOUT, False)
+    a = time()
+    while GPIO.input(ECHOOUT) == 0:
+        pulse_start = time()
+        if pulse_start - a > 0.005:
+            break
+    a = time()
+    while GPIO.input(ECHOOUT) == 1:
+        pulse_end = time()
+        if pulse_end - a > 0.005:
+            break
+    pulse_duration = pulse_end - pulse_start
+    distance = pulse_duration * 17150
+    distance = round(distance, 2)  # in cm
+
+    # get object temperature in celsius
+    if (distance < 6):
+        crowd = PeopleCounting(crowd, _consts, exit=1, enter=0)
+    sleep(0.0001)
+
+    ## INPUT DISTANCE SENSOR
+    sleep(0.001)
+    GPIO.output(TRIGIN, True)
+    sleep(0.0001)
+    GPIO.output(TRIGIN, False)
+    a = time()
+    while GPIO.input(ECHOIN) == 0:
+        pulse_start = time()
+        if pulse_start - a > 0.005:
+            break
+    a = time()
+    while GPIO.input(ECHOIN) == 1:
+        pulse_end = time()
+        if pulse_end - a > 0.005:
+            break
+    pulse_duration = pulse_end - pulse_start
+    distance = pulse_duration * 17150
+    distance = round(distance, 2)  # in cm
+    # get object temperature in celsius
+    if (distance < 6):
+        temp = temperatureCalibration(mlx.object_temperature)
+        print("\nMeasured temperature: {:.1f}".format(temp), " from distance: {:.1f}".format(distance), "\n")
+        print("Maskwear is ", maskpos)
+        if temp < 30:
+            print("\nInvalid temperature!\n")
+        elif temp < 37.5:
+            if maskpos == "Proper Mask":
+                crowd = PeopleCounting(crowd, _consts, exit=0, enter=1)
+        else:
+            print("\nYour temperature is too high. Please go to a medical center!\n")
+
+    return crowd
+
+
+
 def DecisionDetection(_consts):
     #PIN ASSIGMENTS
     TRIGIN = _consts.pin.TRIGIN
@@ -46,59 +108,6 @@ def DecisionDetection(_consts):
     sleep(0.02)
     a = 0
     crowd = 0
+    DDTuple = (TRIGIN, TRIGOUT, ECHOIN, ECHOOUT, mlx, _consts )
     while True:
-        print("PEOPLE INSIDE BUILDING = ", str(crowd), "\nWAITING MODE")
-        ## OUT DISTANCE SENSOR
-        GPIO.output(TRIGOUT, True)
-        sleep(0.0001)
-        GPIO.output(TRIGOUT, False)
-        a = time()
-        while GPIO.input(ECHOOUT) == 0:
-            pulse_start = time()
-            if pulse_start - a > 0.005:
-                break
-        a = time()
-        while GPIO.input(ECHOOUT) == 1:
-            pulse_end = time()
-            if pulse_end - a > 0.005:
-                break
-        pulse_duration = pulse_end - pulse_start
-        distance = pulse_duration * 17150
-        distance = round(distance, 2)  # in cm
-
-        # get object temperature in celsius
-        if (distance < 6):
-            crowd = PeopleCounting(crowd,_consts, exit=1, enter=0)
-        sleep(0.0001)
-
-        ## INPUT DISTANCE SENSOR
-        sleep(0.001)
-        GPIO.output(TRIGIN, True)
-        sleep(0.0001)
-        GPIO.output(TRIGIN, False)
-        a = time()
-        while GPIO.input(ECHOIN) == 0:
-            pulse_start = time()
-            if pulse_start - a > 0.005:
-                break
-        a = time()
-        while GPIO.input(ECHOIN) == 1:
-            pulse_end = time()
-            if pulse_end - a > 0.005:
-                break
-        pulse_duration = pulse_end - pulse_start
-        distance = pulse_duration * 17150
-        distance = round(distance, 2)  # in cm
-        # get object temperature in celsius
-        if (distance < 6):
-            temp = temperatureCalibration(mlx.object_temperature)
-            print("\nMeasured temperature: {:.1f}".format(temp), " distance: {:.1f}".format(distance), "\n")
-
-            if temp < 30:
-                print("\nInvalid temperature!\n")
-            elif temp < 37.5:
-                crowd = PeopleCounting(crowd,_consts, exit=0, enter=1)
-            else:
-                print("\nYour temperature is too high. Please go to a medical center!\n")
-
-        sleep(0.2)
+        crowd = DDLoop(DDTuple, crowd, "Proper Mask")

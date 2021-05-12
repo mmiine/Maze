@@ -1,7 +1,8 @@
 import os
+from multiprocessing import Process
 
 from face_detector.mask_detector import detection
-from sensor.DDSubsytem import DecisionDetection
+#from sensor.DDSubsytem import DecisionDetection
 
 
 
@@ -41,9 +42,9 @@ class _consts:
 
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
 
-
-detection(_consts)
-DecisionDetection(_consts)
+if __name__ == '__main__':
+    os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+    Process(target=detection, args=(_consts,)).start()
+    #DecisionDetection(_consts)

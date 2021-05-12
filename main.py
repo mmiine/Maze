@@ -46,7 +46,11 @@ class _consts:
 
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
-
+    path = os.getcwd()
+    path = path+"\\face_detector\\"
+    _consts.path.prototxtPath=path+"deploy.prototxt"
+    _consts.path.maskNet = path + "mask_detector.model"
+    _consts.path.weightsPath = path + "res10_300x300_ssd_iter_140000.caffemodel"
     try:
         import RPi.GPIO as gpio
         raspberry = True

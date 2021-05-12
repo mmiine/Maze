@@ -3,7 +3,6 @@ from multiprocessing import Process
 from cv2 import waitKey, destroyAllWindows
 
 from face_detector.mask_detector import detection, detectionLoop
-from sensor.DDSubsytem import DecisionDetection , DDLoop
 
 
 
@@ -47,13 +46,24 @@ class _consts:
 
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+    try:
+        import RPi.GPIO as gpio
+        raspberry = True
+    except (ImportError, RuntimeError):
+        raspberry = False
+
     vs, faceNet, maskNet =detection(_consts)
-    DDTuple = DecisionDetection(_consts)
+
+    if (raspberry):
+        from sensor.DDSubsytem import DecisionDetection, DDLoop
+        DDTuple = DecisionDetection(_consts)
+
     while True:
         label = detectionLoop(vs, faceNet, maskNet)
         if label == "Proper Mask":
             print("\n",label,"\n")
-        crowd = DDLoop(DDTuple, crowd, label)
+        if (raspberry): crowd = DDLoop(DDTuple, crowd, label)
 
         key = waitKey(1) & 0xFF
         if key == ord("q"):

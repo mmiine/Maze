@@ -51,23 +51,18 @@ if __name__ == '__main__':
     _consts.path.prototxtPath=path+"deploy.prototxt"
     _consts.path.maskNet = path + "mask_detector.model"
     _consts.path.weightsPath = path + "res10_300x300_ssd_iter_140000.caffemodel"
-    try:
-        import RPi.GPIO as gpio
-        raspberry = True
-    except (ImportError, RuntimeError):
-        raspberry = False
+
 
     vs, faceNet, maskNet =detection(_consts)
 
-    if (raspberry):
-        from sensor.DDSubsytem import DecisionDetection, DDLoop
-        DDTuple = DecisionDetection(_consts)
+    from sensor.DDSubsytem import DecisionDetection, DDLoop
+    DDTuple = DecisionDetection(_consts)
 
     while True:
         label = detectionLoop(vs, faceNet, maskNet)
         if label == "Proper Mask":
             print("\n",label,"\n")
-        if (raspberry): crowd = DDLoop(DDTuple, crowd, label)
+        crowd = DDLoop(DDTuple, crowd, label)
 
         key = waitKey(1) & 0xFF
         if key == ord("q"):

@@ -1,7 +1,4 @@
 import sys
-from guizero import App, Text
-app: App = App(title="Hello world",)
-
 from time import sleep
 from networking.client import client, recieveClient, sendClient
 
@@ -28,9 +25,3 @@ if __name__ == '__main__':
         Do GUI things
         
         '''
-
-
-
-        app.full_screen = 1
-        app.display()
-        sleep(0.01)

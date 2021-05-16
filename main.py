@@ -5,9 +5,7 @@ from cv2 import waitKey, destroyAllWindows
 from face_detector.mask_detector import detection, detectionLoop
 from networking.client import client, recieveClient, sendClient
 
-
-
-from time import sleep, time
+from time import sleep, time, localtime
 
 class _consts:
 
@@ -50,7 +48,7 @@ def processA(SOCKET):
         label0 = label0 + 1
         sleep(8)
         sendClient(str(label0), SOCKET)
-        print("sendtime: ",time())
+        print("sendtime: ",localtime())
 
 def processB(SOCKET):
     data = None

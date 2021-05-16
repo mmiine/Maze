@@ -1,20 +1,21 @@
 import socket
 
+def sendClient(result, socket):
+    socket.send(result.encode('utf-8'))
+
+def recieveClient(socket):
+    result = socket.recv(1024).decode('utf-8')
+    return result
 
 def client():
     host = 'localhost'  # get local machine name
     port = 8080  # Make sure it's within the > 1024 $$ <65535 range
 
     s = socket.socket()
-    s.connect((host, port))
 
-    message = input('-> ')
-    while message != 'q':
-        s.send(message.encode('utf-8'))
-        data = s.recv(1024).decode('utf-8')
-        print('Received from server: ' + data)
-        message = input('==> ')
-    s.close()
+    s.connect((host, port))
+    #s.setblocking(False)
+    return s
 
 
 if __name__ == '__main__':

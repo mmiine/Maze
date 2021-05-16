@@ -12,6 +12,8 @@ from cv2.dnn import readNet,blobFromImage
 from cv2 import cvtColor,COLOR_BGR2RGB,resize,putText,FONT_HERSHEY_SIMPLEX,rectangle
 from cv2 import imshow
 
+from networking.client import sendClient
+
 def detect_and_predict_mask(frame, faceNet, maskNet):
 
 	(h, w) = frame.shape[:2]
@@ -69,7 +71,7 @@ def detection(_consts):
 
 
 
-def detectionLoop(vs, faceNet, maskNet):
+def detectionLoop(vs, faceNet, maskNet,SOCKET):
 	frame = vs.read()
 	frame = imutils.resize(frame, width=400)
 	start = time()
@@ -107,10 +109,12 @@ def detectionLoop(vs, faceNet, maskNet):
 		putText(frame, label, (startX, startY - 10),
 				FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
 		rectangle(frame, (startX, startY), (endX, endY), color, 2)
+	from time import sleep
+	sleep(3)
 	end = time()
 	# show the output frame
 	imshow("Frame", frame)
 
-	print("Latency in miliseconds: ", (end - start) * 1000)
-
-	return label0
+	#print("Latency in miliseconds: ", (end - start) * 1000)
+	print("send time: ", time())
+	sendClient(label0, SOCKET)

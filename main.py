@@ -19,7 +19,7 @@ class _consts:
         ECHOOUT = 20
         TRIGCHK = 6
         ECHOCHK = 5
-        SERVO1 = 17
+        SERVO1 = 18
         PWM1 = None
 
     class pre:
@@ -30,7 +30,7 @@ class _consts:
         waitingTime = 5 # in seconds
 
         servoOpenAngle = 90
-        servoCloseAngle = 0
+        servoCloseAngle = 45
         clientSocketS = None
         clientSocketR = None
 

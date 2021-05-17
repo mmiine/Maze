@@ -9,12 +9,12 @@ def recieveClient(socket):
 
 def client():
     host = 'localhost'  # get local machine name
-    port = 8080  # Make sure it's within the > 1024 $$ <65535 range
+    port = 8083  # Make sure it's within the > 1024 $$ <65535 range
 
     s = socket.socket()
 
     s.connect((host, port))
-    #s.setblocking(False)
+    s.setblocking(False)
     return s
 
 

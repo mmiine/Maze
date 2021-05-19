@@ -1,11 +1,13 @@
 import socket
 
 def sendClient(result, socket):
+    result = result + '*'
     socket.send(result.encode('utf-8'))
 
 def recieveClient(socket):
     result = socket.recv(1024).decode('utf-8')
-    return result
+    results = result.split('*')
+    return results[-2]
 
 def client():
     host = 'localhost'  # get local machine name

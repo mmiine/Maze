@@ -215,10 +215,6 @@ def DDLoop(DDTuple,crowd,maskpos):
     distance = round(distance, 2)  # in cm
     # get object temperature in celsius
     temp = None
-    try:
-        maskpos = maskpos[0:11]
-    except:
-        maskpos = maskpos
     if (distance < 6):
         temp = temperatureCalibration(mlx.object_temperature)
         print("\nMeasured temperature: {:.1f}".format(temp), " from distance: {:.1f}".format(distance), "\n")

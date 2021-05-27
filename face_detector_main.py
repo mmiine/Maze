@@ -17,6 +17,7 @@ import sys
 
 from networking.client import sendClient, client
 
+
 def detect_and_predict_mask(frame, faceNet, maskNet):
 
     (h, w) = frame.shape[:2]
@@ -121,13 +122,11 @@ def detectionLoop(vs, faceNet, maskNet,SOCKET):
     if(SOCKET != None): sendClient(label0, SOCKET)
 
 
-
 if __name__ == '__main__':
     os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
     sys.path.append(".")
     from main import _consts
-
 
     try:
         SOCKET = client()

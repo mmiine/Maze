@@ -11,7 +11,7 @@ def recieveClient(socket):
 
 def client():
     host = 'localhost'  # get local machine name
-    port = 8083  # Make sure it's within the > 1024 $$ <65535 range
+    port = 8049# Make sure it's within the > 1024 $$ <65535 range
 
     s = socket.socket()
 

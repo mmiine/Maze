@@ -1,4 +1,10 @@
 #!/bin/bash
+export PATH="$HOME/.local/.bin:$PATH"
+cd Desktop
+cd tf_pi
+source env/bin/activate
+cd
+cd Maze
 
 python3 networking/server.py
 

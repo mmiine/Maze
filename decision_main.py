@@ -148,7 +148,7 @@ def DecisionDetection(_consts):
     DDTuple = (TRIGIN, TRIGOUT, ECHOIN, ECHOOUT, mlx, _consts )
     return DDTuple
 
-def DDLoop(DDTuple,crowd,maskpos):
+def DDLoop(DDTuple,crowd,maskpos,SOCKET):
     pulse_start = 0
     pulse_end = 0
     TRIGIN, TRIGOUT,ECHOIN,ECHOOUT,mlx,_consts = DDTuple
@@ -214,21 +214,26 @@ def DDLoop(DDTuple,crowd,maskpos):
     distance = pulse_duration * 17150
     distance = round(distance, 2)  # in cm
     # get object temperature in celsius
-    temp = None
+    temp = "None"
+    
+    data=None
     if (distance < 6):
         temp = temperatureCalibration(mlx.object_temperature)
         print("\nMeasured temperature: {:.1f}".format(temp), " from distance: {:.1f}".format(distance), "\n")
         print("Maskwear is ", maskpos)
+        data = str(crowd) + "_"+str(temp)+"_"+maskpos
+        sendClient(data, SOCKET)
         if temp < 30:
             print("\nInvalid temperature!\n")
         elif temp < 37.5:
             if maskpos == "Proper Mask":
+                print("checkingg")
                 crowd = PeopleCounting(crowd, _consts, exit=0, enter=1)
         else:
             print("\nYour temperature is too high. Please go to a medical center!\n")
-    if temp == None: temp="None"
-    if maskpos == None: maskpos="None"
+    if data==None: maskpos = "Waiting for trigger"
     data = str(crowd) + "_"+str(temp)+"_"+maskpos
+    
     return data,crowd
 
 if __name__ == '__main__':
@@ -236,7 +241,7 @@ if __name__ == '__main__':
     from main import _consts
     DDTuple = DecisionDetection(_consts)
 
-    label = None
+    label = "None"
     crowd = 0
     SOCKET = client()
     while True:
@@ -245,6 +250,6 @@ if __name__ == '__main__':
             print("CLIENT DATA RECIEVED: ", label)
         except  BlockingIOError:
             print("NOT RECIEVED OLD DATA: ", label)
-        data,crowd = DDLoop(DDTuple, crowd, label)
+        data,crowd = DDLoop(DDTuple, crowd, label,SOCKET)
         sendClient(data, SOCKET)
 

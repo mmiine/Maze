@@ -10,14 +10,18 @@ import sys
 from sensor.temperatureSensor import temperatureCalibration
 
 
-def servoControl(angle, SERVOPIN, pwm):
+def servoControl(angle, SERVOPIN1, pwm1, SERVOPIN2, pwm2):
     duty = angle / 18 + 3
-    GPIO.output(SERVOPIN, True)
-    pwm.ChangeDutyCycle(duty)
+    GPIO.output(SERVOPIN1, True)
+    pwm1.ChangeDutyCycle(duty)
+    GPIO.output(SERVOPIN2, True)
+    pwm2.ChangeDutyCycle(duty)
     sleep(1)
-    GPIO.output(SERVOPIN, False)
+    GPIO.output(SERVOPIN1, False)
+    GPIO.output(SERVOPIN2, False)
     #if(angle==45):
-    pwm.ChangeDutyCycle(0)
+    pwm1.ChangeDutyCycle(0)
+    pwm2.ChangeDutyCycle(0)
 
 
 def controlSensor(_consts ):
@@ -64,7 +68,9 @@ def PeopleCounting(crowd,_consts, exit=0 ,enter=0):
     servoCloseAngle =_consts.pre.servoCloseAngle
     maxNum = _consts.pre.maxNum
 
-    SERVOPIN, pwm = _consts.pin.SERVO1, _consts.pin.PWM1
+    SERVOPIN1, pwm1 = _consts.pin.SERVO1, _consts.pin.PWM1
+    SERVOPIN2, pwm2 = _consts.pin.SERVO2, _consts.pin.PWM2
+
     sleepTime = 2
 
     isFull = True if crowd == maxNum else False
@@ -77,13 +83,13 @@ def PeopleCounting(crowd,_consts, exit=0 ,enter=0):
             sleep(sleepTime)
         else:
             print("EXITING PROCESSING")
-            servoControl(servoOpenAngle,SERVOPIN,pwm)
+            servoControl(servoOpenAngle,SERVOPIN1,pwm1, SERVOPIN2,pwm2)
             sleep(0.001)
             CONTROL = controlSensor(_consts)
             if CONTROL:
                 crowd = crowd - 1
             sleep(1)
-            servoControl(servoCloseAngle,SERVOPIN,pwm)
+            servoControl(servoCloseAngle,SERVOPIN1,pwm1, SERVOPIN2,pwm2)
             print("EXITING FINISHED")
 
 
@@ -94,12 +100,12 @@ def PeopleCounting(crowd,_consts, exit=0 ,enter=0):
 
         else:
             print("ENTERING PROCESSING")
-            servoControl(servoOpenAngle,SERVOPIN,pwm)
+            servoControl(servoOpenAngle,SERVOPIN1,pwm1, SERVOPIN2,pwm2)
             CONTROL = controlSensor(_consts)
             if CONTROL:
                 crowd = crowd + 1
             sleep(1)
-            servoControl(servoCloseAngle,SERVOPIN,pwm)
+            servoControl(servoCloseAngle,SERVOPIN1,pwm1, SERVOPIN2,pwm2)
             print("ENTERING FINISHED")
     return crowd
 
@@ -116,6 +122,7 @@ def DecisionDetection(_consts):
     TRIGCHK = _consts.pin.TRIGCHK
     ECHOCHK = _consts.pin.ECHOCHK
     SERVO1 = _consts.pin.SERVO1
+    SERVO2 = _consts.pin.SERVO2
 
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
@@ -134,6 +141,11 @@ def DecisionDetection(_consts):
     pwm1 = GPIO.PWM(SERVO1, 50)
     pwm1.start(0)
     _consts.pin.PWM1=pwm1
+
+    GPIO.setup(SERVO2, GPIO.OUT)
+    pwm2 = GPIO.PWM(SERVO2, 50)
+    pwm2.start(0)
+    _consts.pin.PWM2 = pwm2
 
 
     # the mlx90614 must be run at 100k [normal speed]

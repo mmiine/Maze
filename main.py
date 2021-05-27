@@ -13,6 +13,8 @@ class _consts:
         ECHOCHK = 5
         SERVO1 = 18
         PWM1 = None
+        SERVO2 = 18
+        PWM2 = None
 
     class pre:
         '''

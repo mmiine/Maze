@@ -10,18 +10,17 @@ import sys
 from sensor.temperatureSensor import temperatureCalibration
 
 
-def servoControl(angle, SERVOPIN1, pwm1, SERVOPIN2, pwm2):
+def servoControl(angle, SERVOPIN1, pwm1):
     duty = angle / 18 + 3
     GPIO.output(SERVOPIN1, True)
     pwm1.ChangeDutyCycle(duty)
-    GPIO.output(SERVOPIN2, True)
-    pwm2.ChangeDutyCycle(duty)
+    
     sleep(1)
     GPIO.output(SERVOPIN1, False)
-    GPIO.output(SERVOPIN2, False)
+    
     #if(angle==45):
     pwm1.ChangeDutyCycle(0)
-    pwm2.ChangeDutyCycle(0)
+    
 
 
 def controlSensor(_consts ):
@@ -69,7 +68,7 @@ def PeopleCounting(crowd,_consts, exit=0 ,enter=0):
     maxNum = _consts.pre.maxNum
 
     SERVOPIN1, pwm1 = _consts.pin.SERVO1, _consts.pin.PWM1
-    SERVOPIN2, pwm2 = _consts.pin.SERVO2, _consts.pin.PWM2
+    
 
     sleepTime = 2
 
@@ -83,13 +82,13 @@ def PeopleCounting(crowd,_consts, exit=0 ,enter=0):
             sleep(sleepTime)
         else:
             print("EXITING PROCESSING")
-            servoControl(servoOpenAngle,SERVOPIN1,pwm1, SERVOPIN2,pwm2)
+            servoControl(servoOpenAngle,SERVOPIN1,pwm1)
             sleep(0.001)
             CONTROL = controlSensor(_consts)
             if CONTROL:
                 crowd = crowd - 1
             sleep(1)
-            servoControl(servoCloseAngle,SERVOPIN1,pwm1, SERVOPIN2,pwm2)
+            servoControl(servoCloseAngle,SERVOPIN1,pwm1)
             print("EXITING FINISHED")
 
 
@@ -100,12 +99,12 @@ def PeopleCounting(crowd,_consts, exit=0 ,enter=0):
 
         else:
             print("ENTERING PROCESSING")
-            servoControl(servoOpenAngle,SERVOPIN1,pwm1, SERVOPIN2,pwm2)
+            servoControl(servoOpenAngle,SERVOPIN1,pwm1)
             CONTROL = controlSensor(_consts)
             if CONTROL:
                 crowd = crowd + 1
             sleep(1)
-            servoControl(servoCloseAngle,SERVOPIN1,pwm1, SERVOPIN2,pwm2)
+            servoControl(servoCloseAngle,SERVOPIN1,pwm1)
             print("ENTERING FINISHED")
     return crowd
 
@@ -122,7 +121,7 @@ def DecisionDetection(_consts):
     TRIGCHK = _consts.pin.TRIGCHK
     ECHOCHK = _consts.pin.ECHOCHK
     SERVO1 = _consts.pin.SERVO1
-    SERVO2 = _consts.pin.SERVO2
+    
 
     GPIO.setmode(GPIO.BCM)
     GPIO.setwarnings(False)
@@ -141,12 +140,9 @@ def DecisionDetection(_consts):
     pwm1 = GPIO.PWM(SERVO1, 50)
     pwm1.start(0)
     _consts.pin.PWM1=pwm1
-
-    GPIO.setup(SERVO2, GPIO.OUT)
-    pwm2 = GPIO.PWM(SERVO2, 50)
-    pwm2.start(0)
-    _consts.pin.PWM2 = pwm2
-
+    duty = 45 / 18 + 3
+    GPIO.output(SERVO1, True)
+    pwm1.ChangeDutyCycle(duty)
 
     # the mlx90614 must be run at 100k [normal speed]
     # i2c default mode is is 400k [full speed]

@@ -11,10 +11,9 @@ class _consts:
         ECHOOUT = 20
         TRIGCHK = 6
         ECHOCHK = 5
-        SERVO1 = 18
+        SERVO1 = 12
         PWM1 = None
-        SERVO2 = 18
-        PWM2 = None
+        
 
     class pre:
         '''
@@ -23,7 +22,7 @@ class _consts:
         maxNum = 100
         waitingTime = 5 # in seconds
 
-        servoOpenAngle = 90
+        servoOpenAngle = 0
         servoCloseAngle = 45
 
     class path:

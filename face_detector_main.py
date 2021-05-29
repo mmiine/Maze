@@ -90,7 +90,7 @@ def detectionLoop(vs, faceNet, maskNet,SOCKET):
     label0 = "Not Found"
     # loop over the detected face locations and their corresponding
     # locations to find the closest to center
-    minimum = 99999
+    minimum = 0
     selectedbox=None
     selectedpred=None
     width, height = frame.shape[0], frame.shape[1]
@@ -98,10 +98,12 @@ def detectionLoop(vs, faceNet, maskNet,SOCKET):
         # unpack the bounding box and predictions
         (startX, startY, endX, endY) = box
         centerx, centery = (endX-startX)/2, (endY-startY)/2
-        if(sqrt(square(centerx-width)+square(centery-height))<minimum):
+        proximity = sqrt(square(centerx-width)+square(centery-height))
+        boxArea=(endX-startX)*(endY-startY)
+        if(boxArea>minimum):
             selectedbox=box
             selectedpred=pred
-            minimum = sqrt(square(centerx-width)+square(centery-height))
+            minimum = boxArea
     if selectedbox == None:
         return #if no faces detected return
     (startX, startY, endX, endY) = selectedbox

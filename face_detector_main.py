@@ -135,7 +135,6 @@ def detectionLoop(vs, faceNet, maskNet,SOCKET):
 
     end = time()
 # show the output frame
-    print("aaaaa")
     imshow("Frame", frame)
 
     #print("Latency in miliseconds: ", (end - start) * 1000)

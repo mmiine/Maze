@@ -3,10 +3,10 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 from imutils.video import VideoStream
-from numpy import array
+from numpy import array, average, sqrt, square
 import imutils
 
-from time import time
+from time import time, sleep
 
 from cv2.dnn import readNet,blobFromImage
 from cv2 import cvtColor,COLOR_BGR2RGB,resize,putText,FONT_HERSHEY_SIMPLEX,rectangle
@@ -74,8 +74,8 @@ def detection(_consts):
     return vs, faceNet, maskNet
 
 
-
 def detectionLoop(vs, faceNet, maskNet,SOCKET):
+
     frame = vs.read()
     frame = imutils.resize(frame, width=400)
     start = time()
@@ -83,47 +83,65 @@ def detectionLoop(vs, faceNet, maskNet,SOCKET):
     # face mask or not
     try:
         (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
-        label0 = "Not Found"
-        # loop over the detected face locations and their corresponding
-        # locations
-        for (box, pred) in zip(locs, preds):
-            # unpack the bounding box and predictions
-            (startX, startY, endX, endY) = box
-            (improperMask, withoutMask, mask) = pred
-            print("proper: ", mask, " improper: ", improperMask, " non: ", withoutMask)
-            if (mask > withoutMask and mask > improperMask):  # predicted as masked
-                # proper improper comparison
-                label0 = "Proper Mask"
-                color = (0, 255, 0) if label0 == "Proper Mask" else (0, 255, 0)
-
-            elif (improperMask > withoutMask and improperMask > mask):  # predicted as unmasked
-                # improper unmasked comparison
-                label0 = "Improper Mask"
-                color = (255, 255, 0)
-
-            elif (withoutMask > improperMask and withoutMask > mask):  # predicted as unmasked
-                # improper unmasked comparison
-                label0 = "Non Mask"
-                color = (0, 0, 255)
-
-            # include the probability in the label
-            label = "{}: {:.2f}%".format(label0, max(mask, improperMask, withoutMask) * 100)
-
-            # display the label and bounding box rectangle on the output
-            # frame
-            putText(frame, label, (startX, startY - 10),
-                    FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
-            rectangle(frame, (startX, startY), (endX, endY), color, 2)
-    
-        end = time()
-    # show the output frame
-        imshow("Frame", frame)
-
-        print("Latency in miliseconds: ", (end - start) * 1000)
-
-        if(SOCKET != None): sendClient(label0, SOCKET)
     except:
         print("Some error occured during detect and predict phase")
+        return
+
+    label0 = "Not Found"
+    # loop over the detected face locations and their corresponding
+    # locations to find the closest to center
+    minimum = 99999
+    selectedbox=None
+    selectedpred=None
+    width, height = frame.shape[0], frame.shape[1]
+    for (box, pred) in zip(locs, preds):
+        # unpack the bounding box and predictions
+        (startX, startY, endX, endY) = box
+        centerx, centery = (endX-startX)/2, (endY-startY)/2
+        if(sqrt(square(centerx-width)+square(centery-height))<minimum):
+            selectedbox=box
+            selectedpred=pred
+            minimum = sqrt(square(centerx-width)+square(centery-height))
+    if selectedbox == None:
+        return #if no faces detected return
+    (startX, startY, endX, endY) = selectedbox
+    pred = selectedpred
+
+    (improperMask, withoutMask, mask) = pred
+    #print("proper: ", mask, " improper: ", improperMask, " non: ", withoutMask)
+    if (mask > withoutMask and mask > improperMask):  # predicted as masked
+        # proper improper comparison
+        label0 = "Proper Mask"
+        color = (0, 255, 0) if label0 == "Proper Mask" else (0, 255, 0)
+
+    elif (improperMask > withoutMask and improperMask > mask):  # predicted as unmasked
+        # improper unmasked comparison
+        label0 = "Improper Mask"
+        color = (255, 255, 0)
+
+    elif (withoutMask > improperMask and withoutMask > mask):  # predicted as unmasked
+        # improper unmasked comparison
+        label0 = "Non Mask"
+        color = (0, 0, 255)
+
+    # include the probability in the label
+    label = "{}: {:.2f}%".format(label0, max(mask, improperMask, withoutMask) * 100)
+
+    # display the label and bounding box rectangle on the output
+    # frame
+    putText(frame, label, (startX, startY - 10),
+            FONT_HERSHEY_SIMPLEX, 0.45, color, 2)
+    rectangle(frame, (startX, startY), (endX, endY), color, 2)
+
+    end = time()
+# show the output frame
+    print("aaaaa")
+    imshow("Frame", frame)
+
+    #print("Latency in miliseconds: ", (end - start) * 1000)
+
+    if(SOCKET != None): sendClient(label0, SOCKET)
+
 
 
 if __name__ == '__main__':

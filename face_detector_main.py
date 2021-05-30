@@ -3,10 +3,10 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from tensorflow.keras.preprocessing.image import img_to_array
 from tensorflow.keras.models import load_model
 from imutils.video import VideoStream
-from numpy import array, average, sqrt, square
+from numpy import array, sqrt, square
 import imutils
 
-from time import time, sleep
+from time import time
 
 from cv2.dnn import readNet,blobFromImage
 from cv2 import cvtColor,COLOR_BGR2RGB,resize,putText,FONT_HERSHEY_SIMPLEX,rectangle

@@ -4,12 +4,13 @@ from guizero import App, Text
 import random
 from networking.client import client, recieveClient, sendClient
 
+state="none"
 temperature="none"
 mask_position="none"
 crowd = "none"
 SOCKET = client()
 UPDATE_FREQUENCY = 100 #time in milliseconds (ms)
-data="none_none_none"
+data="none_none_none_none"
 def recieve_data():
     try:
         data = recieveClient(SOCKET)
@@ -18,17 +19,18 @@ def recieve_data():
         print("NOT RECIEVED RETURNING")
         return
     if(data==None):
-        data="none_none_none"
+        data="none_none_none_none"
     x = data.split("_")
-    crowd = x[0]
-    temperature = x[1]
+    state = x[0]
+    crowd = x[1]
+    temperature = x[2]
     try:
         temperature=float(temperature)
         temperature="{:.1f}".format(temperature)
         temperature=str(temperature)
     except:
         temperature=temperature
-    mask_position = x[2]
+    mask_position = x[3]
     print("pop: ",crowd," temp: ",temperature," mask: ",mask_position)
     
     temp.value = temperature 

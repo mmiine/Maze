@@ -1,4 +1,6 @@
-
+from networking.client import sendClient, client
+from time import sleep
+import random
 class _consts:
 
     class pin:
@@ -39,7 +41,32 @@ class _consts:
 
 
 
-
+if __name__ == '__main__':
+    try:
+        SOCKET = client()
+    except ConnectionRefusedError:
+        print("[INFO] No server is found!")
+        SOCKET = None
+    crowd = "none"
+    temp = "none"
+    maskpos = "none"
+    while True:
+        state = 'a'
+        crowd = "none"
+        temp = "none"
+        maskpos = "none"
+        data = state+ "_" + str(crowd) + "_" + str(temp) + "_" + maskpos
+        print(data)
+        sendClient(data, SOCKET)
+        sleep(1)
+        state = 'b'
+        crowd = random.randint(0,10)
+        temp = random.randrange(36,42)
+        maskpos= random.choice(["Proper Mask","Improper Mask","Non Mask"])
+        data = state+ "_" +str(crowd) + "_" + str(temp) + "_" + maskpos
+        sendClient(data, SOCKET)
+        print(data)
+        sleep(1)
 
 '''
 def processA(SOCKET):

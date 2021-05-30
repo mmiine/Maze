@@ -4,6 +4,8 @@ from guizero import App, Text
 import random
 from networking.client import client, recieveClient, sendClient
 
+sys.path.append(".")
+from main import _consts
 state="none"
 temperature="none"
 mask_position="none"
@@ -38,10 +40,25 @@ def recieve_data():
     #maske.value = mask_position
     #st.value = state
 
-    if state == 'a':
-        message.value = "Waiting"
-    else:
-        message.value = ("pop ={} temp ={} mask ={}".format(crowd,temperature,mask_position))
+    if state == 'a': #waiting state
+        message.value = "Please bring your hand over to the sensor"
+    elif state == 'b': #entering process started
+        if crowd < _consts.pre.maxNum and temperature<37.5 and mask_position=="Proper Mask":
+            "Enterance Allowed"
+        elif crowd>=_consts.pre.maxNum:
+            "Population limit has been reached"
+        elif temperature>37.5:
+            "Your temperature is too high. Please go to a medical center!"
+        elif temperature<34:
+            "Invaild temperature"
+        elif mask_position=="Improper Mask" or mask_position=="Non Mask":
+            "Your mask wear is not proper!"
+
+
+    elif state == 'c': #exiting process started
+        "exit"
+
+    #message.value = ("Population inside building: {} \n temp ={} mask ={}".format(crowd,temperature,mask_position))
 
     
 

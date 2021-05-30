@@ -41,7 +41,7 @@ def recieve_data():
     if state == 'a':
         message.value = "Waiting"
     else:
-        message.value = ("pop ={} temp ={} mask{}".format(crowd,temperature,mask_position))
+        message.value = ("pop ={} temp ={} mask ={}".format(crowd,temperature,mask_position))
 
     
 

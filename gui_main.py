@@ -31,27 +31,36 @@ def recieve_data():
     except:
         temperature=temperature
     mask_position = x[3]
-    print("pop: ",crowd," temp: ",temperature," mask: ",mask_position)
+    print("state: ",state,"pop: ",crowd," temp: ",temperature," mask: ",mask_position)
     
-    temp.value = temperature 
-    pop.value = crowd
-    maske.value = mask_position
+    #temp.value = temperature
+    #pop.value = crowd
+    #maske.value = mask_position
+    #st.value = state
+
+    if state == 'a':
+        message.value = "Waiting"
+    else:
+        message.value = ("pop ={} temp ={} mask{}".format(crowd,temperature,mask_position))
+
     
 
 if __name__ == '__main__':
-        
+
     app = App(title="Maze-Surveillance", width=720, height=480, layout="grid")  #lcd size ???
-    message = Text(app, text="Entrance allowed", size=25, font="Times New Roman", color="black", grid=[2, 0], align="left")
 
-    mask = Text(app, text="Proper mask :", size=25, font="Times New Roman", color="black", grid=[2, 1], align="left")
-    maske = Text(app, "xx", size=25, font="Times New Roman", grid=[3, 1])
+    message = Text(app,"xx", size=25, font="Times New Roman", color="black", grid=[2, 0], align="left")
 
 
-    Temperature = Text(app, text="Temperature :", size=25, font="Times New Roman", color="black", grid=[2, 2], align="left")
-    temp = Text(app, "xx", size=25, font="Times New Roman", grid=[3, 2])
+    #mask = Text(app, text="Proper mask :", size=25, font="Times New Roman", color="black", grid=[2, 1], align="left")
+    #maske = Text(app, "xx", size=25, font="Times New Roman", grid=[3, 1])
 
-    Population = Text(app, text="Population :", size=25, font="Times New Roman", color="black", grid=[2, 3], align="left")
-    pop = Text(app, "xx", size=25, font="Times New Roman", grid=[3, 3])
+
+    #Temperature = Text(app, text="Temperature :", size=25, font="Times New Roman", color="black", grid=[2, 2], align="left")
+    #temp = Text(app, "xx", size=25, font="Times New Roman", grid=[3, 2])
+
+    #Population = Text(app, text="Population :", size=25, font="Times New Roman", color="black", grid=[2, 3], align="left")
+    #pop = Text(app, "xx", size=25, font="Times New Roman", grid=[3, 3])
     
     app.repeat(UPDATE_FREQUENCY, recieve_data)
 

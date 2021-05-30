@@ -105,6 +105,7 @@ def detectionLoop(vs, faceNet, maskNet,SOCKET):
             selectedpred=pred
             minimum = boxArea
     if selectedbox == None:
+        imshow("Frame", frame)
         return #if no faces detected return
     (startX, startY, endX, endY) = selectedbox
     pred = selectedpred

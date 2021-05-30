@@ -52,7 +52,6 @@ if __name__ == '__main__':
     maskpos = "none"
     while True:
         state = 'a'
-        crowd = "none"
         temp = "none"
         maskpos = "none"
         data = state+ "_" + str(crowd) + "_" + str(temp) + "_" + maskpos

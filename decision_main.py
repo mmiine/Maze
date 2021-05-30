@@ -9,6 +9,9 @@ from time import time, sleep
 import sys
 from sensor.temperatureSensor import temperatureCalibration
 
+def encodeSendData(SOCKET,state="a",crowd="none", temperature="none", maskwear="none"):
+    data = state + "_" + str(crowd) + "_" + str(temperature) + "_" + maskwear
+    sendClient(data, SOCKET)
 
 def servoControl(angle, SERVOPIN1, pwm1):
     duty = angle / 18 + 3
@@ -157,6 +160,7 @@ def DecisionDetection(_consts):
     return DDTuple
 
 def DDLoop(DDTuple,crowd,maskpos,SOCKET):
+    state = 'a'
     pulse_start = 0
     pulse_end = 0
     TRIGIN, TRIGOUT,ECHOIN,ECHOOUT,mlx,_consts = DDTuple
@@ -180,7 +184,7 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
     distance = pulse_duration * 17150
     distance = round(distance, 2)  # in cm
     
-    # get object temperature in celsius
+    # OUTPUT DISCANCE SENSOR DISTANCE CONTROL
     if ((distance > 1) and (distance < 6)):
         GPIO.output(TRIGOUT, True)
         sleep(0.0001)
@@ -200,6 +204,7 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
         distance = round(distance, 2)  # in cm
         
         if ((distance > 1) and (distance < 6)):
+            encodeSendData(SOCKET, "c", crowd)
             crowd = PeopleCounting(crowd, _consts, exit=1, enter=0)
     sleep(0.0001)
 
@@ -221,34 +226,29 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
     pulse_duration = pulse_end - pulse_start
     distance = pulse_duration * 17150
     distance = round(distance, 2)  # in cm
-    # get object temperature in celsius
     temp = "None"
-    
-    data=None
+    if(distance>6):
+        encodeSendData(SOCKET,"a",crowd, temp, maskpos)
     if (distance < 6):
+        # get object temperature in celsius
         temp = temperatureCalibration(mlx.object_temperature)
-        print("\nMeasured temperature: {:.1f}".format(temp), " from distance: {:.1f}".format(distance), "\n")
-        print("Maskwear is ", maskpos)
-        data = str(crowd) + "_"+str(temp)+"_"+maskpos
-        sendClient(data, SOCKET)
+        print("\nMeasured temperature: {:.1f}".format(temp), " from distance: {:.1f}".format(distance), " in ", maskpos, "maskwear")
+        encodeSendData(SOCKET,"b",crowd, temp, maskpos)
         if temp < 30:
             print("\nInvalid temperature!\n")
         elif temp < 37.5:
             if maskpos == "Proper Mask":
-                print("checkingg")
                 crowd = PeopleCounting(crowd, _consts, exit=0, enter=1)
         else:
             print("\nYour temperature is too high. Please go to a medical center!\n")
-    if data==None: maskpos = "Waiting for trigger"
-    data = str(crowd) + "_"+str(temp)+"_"+maskpos
-    
+
     return data,crowd
 
 if __name__ == '__main__':
     sys.path.append(".")
     from main import _consts
     DDTuple = DecisionDetection(_consts)
-
+    data='a_none_none_none'
     label = "None"
     crowd = 0
     SOCKET = client()
@@ -258,6 +258,7 @@ if __name__ == '__main__':
             print("CLIENT DATA RECIEVED: ", label)
         except  BlockingIOError:
             print("NOT RECIEVED OLD DATA: ", label)
+        sendClient(data, SOCKET)
         data,crowd = DDLoop(DDTuple, crowd, label,SOCKET)
         sendClient(data, SOCKET)
 

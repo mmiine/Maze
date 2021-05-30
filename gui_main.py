@@ -13,6 +13,7 @@ crowd = "none"
 SOCKET = client()
 UPDATE_FREQUENCY = 100 #time in milliseconds (ms)
 data="none_none_none_none"
+
 def recieve_data():
     try:
         data = recieveClient(SOCKET)
@@ -39,25 +40,28 @@ def recieve_data():
     #pop.value = crowd
     #maske.value = mask_position
     #st.value = state
+    try:
+        crowd = int(crowd)
+        temperature = float(temperature)
+        if state == 'a': #waiting state
+            message.value = "Please bring your hand over to the sensor\nPopulation inside building: {}".format(crowd)
+        elif state == 'b': #entering process started
+            if crowd < _consts.pre.maxNum and temperature<37.5 and mask_position=="Proper Mask":
+                message.value = "Enterance Allowed\nYour temperature is {} celcius degrees".format(temperature)
+            elif crowd>=_consts.pre.maxNum:
+                message.value = "Population limit has been reached"
+            elif temperature>37.5:
+                message.value = "Your temperature is too high. Please go to a medical center!\nYour temperature is {} celcius degrees".format(temperature)
+            elif temperature<34:
+                message.value = "Invaild temperature"
+            elif mask_position=="Improper Mask" or mask_position=="Non Mask":
+                message.value = "Your mask wear is not proper!"
 
-    if state == 'a': #waiting state
-        message.value = "Please bring your hand over to the sensor"
-    elif state == 'b': #entering process started
-        if crowd < _consts.pre.maxNum and temperature<37.5 and mask_position=="Proper Mask":
-            "Enterance Allowed"
-        elif crowd>=_consts.pre.maxNum:
-            "Population limit has been reached"
-        elif temperature>37.5:
-            "Your temperature is too high. Please go to a medical center!"
-        elif temperature<34:
-            "Invaild temperature"
-        elif mask_position=="Improper Mask" or mask_position=="Non Mask":
-            "Your mask wear is not proper!"
 
-
-    elif state == 'c': #exiting process started
-        "exit"
-
+        elif state == 'c': #exiting process started
+            message.value = "Exit process is started"
+    except:
+        message.value = "Please bring your hand over to the sensor\nPopulation inside building: {}".format(crowd)
     #message.value = ("Population inside building: {} \n temp ={} mask ={}".format(crowd,temperature,mask_position))
 
     

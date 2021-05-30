@@ -65,7 +65,7 @@ if __name__ == '__main__':
         data = state+ "_" +str(crowd) + "_" + str(temp) + "_" + maskpos
         sendClient(data, SOCKET)
         print(data)
-        sleep(1)
+        sleep(2)
 
 '''
 def processA(SOCKET):

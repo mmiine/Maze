@@ -166,7 +166,7 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
     TRIGIN, TRIGOUT,ECHOIN,ECHOOUT,mlx,_consts = DDTuple
     sleep(0.0001)
     print("PEOPLE INSIDE BUILDING = ", str(crowd), "\nWAITING MODE")
-    ## OUT DISTANCE SENSOR
+    ## EXITING DISTANCE SENSOR
     GPIO.output(TRIGOUT, True)
     sleep(0.0001)
     GPIO.output(TRIGOUT, False)
@@ -184,7 +184,7 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
     distance = pulse_duration * 17150
     distance = round(distance, 2)  # in cm
     
-    # OUTPUT DISCANCE SENSOR DISTANCE CONTROL
+    # EXITING DISTANCE SENSOR and DISTANCE CONTROL
     if ((distance > 1) and (distance < 6)):
         GPIO.output(TRIGOUT, True)
         sleep(0.0001)
@@ -208,7 +208,7 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
             crowd = PeopleCounting(crowd, _consts, exit=1, enter=0)
     sleep(0.0001)
 
-    ## INPUT DISTANCE SENSOR
+    ## ENTERING DISTANCE SENSOR
     sleep(0.001)
     GPIO.output(TRIGIN, True)
     sleep(0.0001)
@@ -228,8 +228,8 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
     distance = round(distance, 2)  # in cm
     temp = "None"
     if(distance>6):
-        encodeSendData(SOCKET,"a",crowd, temp, maskpos)
-    if (distance < 6):
+        encodeSendData(SOCKET,"a",crowd, maskpos)
+    if ((distance < 6) and (distance > 1)):
         # get object temperature in celsius
         temp = temperatureCalibration(mlx.object_temperature)
         print("\nMeasured temperature: {:.1f}".format(temp), " from distance: {:.1f}".format(distance), " in ", maskpos, "maskwear")

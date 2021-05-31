@@ -9,14 +9,14 @@ def recieveClient(socket):
     results = result.split('*')
     return results[-2]
 
-def client():
+def client(nongui=True):
     host = 'localhost'  # get local machine name
-    port = 8049# Make sure it's within the > 1024 $$ <65535 range
+    port = 8053# Make sure it's within the > 1024 $$ <65535 range
 
     s = socket.socket()
 
     s.connect((host, port))
-    s.setblocking(False)
+    if(nongui): s.setblocking(False)
     return s
 
 

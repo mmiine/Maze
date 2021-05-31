@@ -9,7 +9,7 @@ from time import time, sleep
 import sys
 from sensor.temperatureSensor import temperatureCalibration
 
-def encodeSendData(SOCKET,state="a",crowd="none", temperature="none", maskwear="none"):
+def encodeSendData(SOCKET,crowd,state="a", temperature="none", maskwear="none"):
     data = state + "_" + str(crowd) + "_" + str(temperature) + "_" + maskwear
     sendClient(data, SOCKET)
 
@@ -55,7 +55,7 @@ def controlSensor(_consts ):
         distance = round(distance, 2)  # in cm
         
         # get distance temperature in celsius
-        if (distance < 10 and distance > 1):
+        if (distance < 15 and distance > 1):
             counter=counter+1
             print(distance)
         if (counter>=3):
@@ -204,7 +204,7 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
         distance = round(distance, 2)  # in cm
         
         if ((distance > 1) and (distance < 6)):
-            encodeSendData(SOCKET, "c", crowd)
+            encodeSendData(SOCKET, crowd, "c")
             crowd = PeopleCounting(crowd, _consts, exit=1, enter=0)
     sleep(0.0001)
 
@@ -227,21 +227,22 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
     distance = pulse_duration * 17150
     distance = round(distance, 2)  # in cm
     temp = "None"
-    if(distance>6):
-        encodeSendData(SOCKET,"a",crowd, maskpos)
-    if ((distance < 6) and (distance > 1)):
+    print(distance)
+    if(distance> 6):
+        encodeSendData(SOCKET, crowd,"a", maskpos)
+    if ((distance < 6) and (distance > 4.5)):
         # get object temperature in celsius
-        temp = temperatureCalibration(mlx.object_temperature)
+        temp = mlx.object_temperature + 6.5
         print("\nMeasured temperature: {:.1f}".format(temp), " from distance: {:.1f}".format(distance), " in ", maskpos, "maskwear")
-        encodeSendData(SOCKET,"b",crowd, temp, maskpos)
-        if temp < 30:
+        encodeSendData(SOCKET, crowd,"b", temp, maskpos)
+        if temp < 35:
             print("\nInvalid temperature!\n")
         elif temp < 37.5:
             if maskpos == "Proper Mask":
                 crowd = PeopleCounting(crowd, _consts, exit=0, enter=1)
         else:
             print("\nYour temperature is too high. Please go to a medical center!\n")
-
+        sleep(3)
     return data,crowd
 
 if __name__ == '__main__':

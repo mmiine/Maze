@@ -21,7 +21,7 @@ class _consts:
         '''
         Predetermined Constants
         '''
-        maxNum = 100
+        maxNum = 7
         waitingTime = 5 # in seconds
 
         servoOpenAngle = 0

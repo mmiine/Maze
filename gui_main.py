@@ -9,8 +9,8 @@ from main import _consts
 state="none"
 temperature="none"
 mask_position="none"
-crowd = "none"
-SOCKET = client()
+
+SOCKET = client(False)
 UPDATE_FREQUENCY = 100 #time in milliseconds (ms)
 data="none_none_none_none"
 
@@ -21,71 +21,68 @@ def recieve_data():
     except  BlockingIOError:
         print("NOT RECIEVED RETURNING")
         return
-    if(data==None):
-        data="none_none_none_none"
     x = data.split("_")
     state = x[0]
     crowd = x[1]
     temperature = x[2]
-    try:
-        temperature=float(temperature)
-        temperature="{:.1f}".format(temperature)
-        temperature=str(temperature)
-    except:
-        temperature=temperature
     mask_position = x[3]
-    print("state: ",state,"pop: ",crowd," temp: ",temperature," mask: ",mask_position)
     
-    #temp.value = temperature
-    #pop.value = crowd
-    #maske.value = mask_position
-    #st.value = state
-    try:
-        crowd = int(crowd)
-        temperature = float(temperature)
-        if state == 'a': #waiting state
+    print("state: ", state, "pop: ", crowd, " temp: ", temperature, " mask: ", mask_position)
+    if(crowd == "none"):
+        return
+    if state == 'a': #waiting state
+        if crowd == _consts.pre.maxNum :
+            message.text_color = "blue"
+            message.value = "Building has reached population limit\nPopulation inside building: {}".format(crowd)
+        else:
             message.text_color = "blue"
             message.value = "Please bring your hand over to the sensor\nPopulation inside building: {}".format(crowd)
 
-        elif state == 'b': #entering process started
-            if crowd < _consts.pre.maxNum and temperature<37.5 and mask_position=="Proper Mask":
-                message.text_color = "green"
-                message.value = "Enterance Allowed\nYour temperature is {} celcius degrees".format(temperature)
-            elif crowd>=_consts.pre.maxNum:
-                message.text_color = "red"
-                message.value = "Population limit has been reached"
+    elif (state == 'b'):  # entering process started
+        crowd = int(crowd)
+        temperature = float(temperature)
+        temperature = temperature 
 
-            elif temperature>37.5 and  mask_position=="Proper Mask":
-                message.text_color = "red"
-                message.value = "Your temperature is too high. Please go to a medical center!\nYour temperature is {} celcius degrees".format(temperature)
+        if crowd < _consts.pre.maxNum and temperature > 35 and temperature < 37.5 and mask_position == "Proper Mask":
+            message.text_color = "green"
+            message.value = "Enterance Allowed\nYour temperature is {:.1f} celcius degrees".format(temperature)
+        elif crowd >= _consts.pre.maxNum:
+            message.text_color = "red"
+            message.value = "Population limit has been reached"
 
-            elif temperature>37.5 and  mask_position=="Improper Mask":
-                message.text_color = "red"
-                message.value = "You are not wearing your face mask properly!\nYour temperature is too high. Please go to a medical center!\nYour temperature is {} celcius degrees".format(temperature)
+        elif temperature > 37.5 and mask_position == "Proper Mask":
+            message.text_color = "red"
+            message.value = "Your temperature is too high. Please go to a medical center!\nYour temperature is {:.1f} celcius degrees".format(
+                temperature)
 
-            elif temperature > 37.5 and mask_position == "Non Mask":
-                message.text_color = "red"
-                message.value = "You are not wearing your face mask!\nYour temperature is too high. Please go to a medical center!\nYour temperature is {} celcius degrees".format(temperature)
+        elif temperature > 37.5 and mask_position == "Improper Mask":
+            message.text_color = "red"
+            message.value = "You are not wearing your face mask properly!\nYour temperature is too high. Please go to a medical center!\nYour temperature is {:.1f} celcius degrees".format(
+                temperature)
 
-            elif temperature < 37.5 and temperature > 34.5 and mask_position == "Improper Mask":
-                message.text_color = "red"
-                message.value = "You are not wearing your face mask properly!\nYour temperature is {} celcius degrees".format(temperature)
+        elif temperature > 37.5 and mask_position == "Non Mask":
+            message.text_color = "red"
+            message.value = "You are not wearing your face mask!\nYour temperature is too high. Please go to a medical center!\nYour temperature is {:.1f} celcius degrees".format(
+                temperature)
 
-            elif temperature < 37.5 and temperature > 34.5 and mask_position == "Non Mask":
-                message.text_color = "red"
-                message.value = "You are not wearing your face mask!\nYour temperature is {} celcius degrees".format(temperature)
+        elif temperature < 37.5 and temperature > 35 and mask_position == "Improper Mask":
+            message.text_color = "red"
+            message.value = "You are not wearing your face mask properly!\nYour temperature is {:.1f} celcius degrees".format(
+                temperature)
 
-            elif temperature < 34.5 :
-                message.text_color = "red"
-                message.value = "Invalid temperature!"
+        elif temperature < 37.5 and temperature > 35 and mask_position == "Non Mask":
+            message.text_color = "red"
+            message.value = "You are not wearing your face mask!\nYour temperature is {:.1f} celcius degrees".format(
+                temperature)
 
+        elif temperature < 35:
+            message.text_color = "red"
+            message.value = "Invalid temperature! \nYour temperature is {:.1f} celcius degrees".format(temperature)
 
-
-
-        elif state == 'c': #exiting process started
-            message.text_color = "blue"
-            message.value = "Exit process is started"
-    except:
+    elif state == 'c': #exiting process started
+        message.text_color = "blue"
+        message.value = "Exit process is started"
+    else:
         message.text_color = "blue"
         message.value = "Please bring your hand over to the sensor\nPopulation inside building: {}".format(crowd)
     #message.value = ("Population inside building: {} \n temp ={} mask ={}".format(crowd,temperature,mask_position))
@@ -97,7 +94,7 @@ if __name__ == '__main__':
     app = App(title="Maze-Surveillance", width=720, height=480, layout="grid")  #lcd size ???
 
     message = Text(app,"xx", size=25, font="Times New Roman", color="black", grid=[2, 0], align="left")
-
+    sleep(3)
 
     #mask = Text(app, text="Proper mask :", size=25, font="Times New Roman", color="black", grid=[2, 1], align="left")
     #maske = Text(app, "xx", size=25, font="Times New Roman", grid=[3, 1])

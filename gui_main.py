@@ -44,23 +44,49 @@ def recieve_data():
         crowd = int(crowd)
         temperature = float(temperature)
         if state == 'a': #waiting state
+            message.text_color = "blue"
             message.value = "Please bring your hand over to the sensor\nPopulation inside building: {}".format(crowd)
+
         elif state == 'b': #entering process started
             if crowd < _consts.pre.maxNum and temperature<37.5 and mask_position=="Proper Mask":
+                message.text_color = "green"
                 message.value = "Enterance Allowed\nYour temperature is {} celcius degrees".format(temperature)
             elif crowd>=_consts.pre.maxNum:
+                message.text_color = "red"
                 message.value = "Population limit has been reached"
-            elif temperature>37.5:
+
+            elif temperature>37.5 and  mask_position=="Proper Mask":
+                message.text_color = "red"
                 message.value = "Your temperature is too high. Please go to a medical center!\nYour temperature is {} celcius degrees".format(temperature)
-            elif temperature<34:
-                message.value = "Invaild temperature"
-            elif mask_position=="Improper Mask" or mask_position=="Non Mask":
-                message.value = "Your mask wear is not proper!"
+
+            elif temperature>37.5 and  mask_position=="Improper Mask":
+                message.text_color = "red"
+                message.value = "You are not wearing your face mask properly!\nYour temperature is too high. Please go to a medical center!\nYour temperature is {} celcius degrees".format(temperature)
+
+            elif temperature > 37.5 and mask_position == "Non Mask":
+                message.text_color = "red"
+                message.value = "You are not wearing your face mask!\nYour temperature is too high. Please go to a medical center!\nYour temperature is {} celcius degrees".format(temperature)
+
+            elif temperature < 37.5 and temperature > 34.5 and mask_position == "Improper Mask":
+                message.text_color = "red"
+                message.value = "You are not wearing your face mask properly!\nYour temperature is {} celcius degrees".format(temperature)
+
+            elif temperature < 37.5 and temperature > 34.5 and mask_position == "Non Mask":
+                message.text_color = "red"
+                message.value = "You are not wearing your face mask!\nYour temperature is {} celcius degrees".format(temperature)
+
+            elif temperature < 34.5 :
+                message.text_color = "red"
+                message.value = "Invalid temperature!"
+
+
 
 
         elif state == 'c': #exiting process started
+            message.text_color = "blue"
             message.value = "Exit process is started"
     except:
+        message.text_color = "blue"
         message.value = "Please bring your hand over to the sensor\nPopulation inside building: {}".format(crowd)
     #message.value = ("Population inside building: {} \n temp ={} mask ={}".format(crowd,temperature,mask_position))
 
@@ -86,6 +112,7 @@ if __name__ == '__main__':
     app.repeat(UPDATE_FREQUENCY, recieve_data)
 
     try:
+        app.full_screen = 1
         app.display()
     except KeyboardInterrupt:
         SOCKET.close()

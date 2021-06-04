@@ -54,6 +54,7 @@ if __name__ == '__main__':
         state = 'a'
         temp = "none"
         maskpos = "none"
+        crowd= "none"
         data = state+ "_" + str(crowd) + "_" + str(temp) + "_" + maskpos
         print(data)
         sendClient(data, SOCKET)

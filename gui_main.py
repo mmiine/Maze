@@ -1,6 +1,6 @@
 import sys
 from time import sleep
-from guizero import App, Text
+from guizero import App, Text, Picture
 import random
 from networking.client import client, recieveClient, sendClient
 
@@ -105,7 +105,8 @@ if __name__ == '__main__':
 
     #Population = Text(app, text="Population :", size=25, font="Times New Roman", color="black", grid=[2, 3], align="left")
     #pop = Text(app, "xx", size=25, font="Times New Roman", grid=[3, 3])
-    
+
+    picture = Picture(app, image="test.gif")
     app.repeat(UPDATE_FREQUENCY, recieve_data)
 
     try:

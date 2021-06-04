@@ -8,3 +8,5 @@ board
 adafruit_mlx90614
 guizero
 RPi
+keyboard
+xlsxwriter

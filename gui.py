@@ -27,8 +27,9 @@ print(image_paths)
 def recieve_data():
     picpath=9
     state = random.choice(['a','b','c'])
+    state = 'b'
     crowd = str(random.randint(0, 5))
-    temperature = str(random.randrange(340, 360) / 10)
+    temperature = str(random.randrange(345, 380) / 10)
     mask_position = random.choice(["Proper Mask", "Improper Mask", "Non Mask"])
 
     print("state: ", state, "pop: ", crowd, " temp: ", temperature, " mask: ", mask_position)

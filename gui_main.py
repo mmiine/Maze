@@ -15,13 +15,14 @@ SOCKET = client()
 UPDATE_FREQUENCY = 100  # time in milliseconds (ms)
 data = "none_none_none_none"
 
-pathh = "images"
+pathh = "/home/pi/Maze/images"
 image_paths=[]
 for img in listdir(pathh):
     img_path = path.join(pathh, img)
     image_paths.append(img_path)
-
+image_paths.sort()
 print(image_paths)
+
 def recieve_data():
     try:
         data = recieveClient(SOCKET)
@@ -108,8 +109,8 @@ def recieve_data():
 if __name__ == '__main__':
 
     app = App(title="Maze-Surveillance", width=720, height=480, bg='white')  # lcd size ???
-    picture = Picture(app, image=image_paths[0])
-    message = Text(app, "xx", size=25, font="Times New Roman", color="black", grid=[2, 0])
+    picture = Picture(app, image=image_paths[9])
+    message = Text(app, "starting", size=25, font="Times New Roman", color="black", grid=[2, 0])
 
     # mask = Text(app, text="Proper mask :", size=25, font="Times New Roman", color="black", grid=[2, 1], align="left")
     # maske = Text(app, "xx", size=25, font="Times New Roman", grid=[3, 1])

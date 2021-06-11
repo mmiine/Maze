@@ -22,8 +22,7 @@ for img in os.listdir(path):
     img_path = os.path.join(path, img)
     image_paths.append(img_path)
 
-print(image_paths)
-
+image_paths.sort()
 def recieve_data():
     picpath=9
     state = random.choice(['a','b','c'])
@@ -105,8 +104,8 @@ def recieve_data():
 if __name__ == '__main__':
 
     app = App(title="Maze-Surveillance", width=720, height=480, bg='white' )  # lcd size ???
-    picture = Picture(app, image=image_paths[0])
-    message = Text(app, "xx", size=25, font="Times New Roman", color="black", grid=[2, 0])
+    picture = Picture(app, image=image_paths[9])
+    message = Text(app, " ", size=25, font="Times New Roman", color="black", grid=[2, 0])
 
 
     # mask = Text(app, text="Proper mask :", size=25, font="Times New Roman", color="black", grid=[2, 1], align="left")

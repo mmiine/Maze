@@ -3,6 +3,11 @@ def temperatureCalibration(x,y):
     x: distance
     y: measured temperature
     """
+    if(y<28 or y>35):
+        return y
+    if(x>7):
+        return y
+    
     p00 = 195.4
     p10 = -12.7
     p01 = -15.83

@@ -232,7 +232,7 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
         encodeSendData(SOCKET, crowd,"a", maskpos)
     if ((distance < 6) and (distance > 4.5)):
         # get object temperature in celsius
-        temp = mlx.object_temperature + 6.5
+        temp = temperatureCalibration(distance,mlx.object_temperature)
         print("\nMeasured temperature: {:.1f}".format(temp), " from distance: {:.1f}".format(distance), " in ", maskpos, "maskwear")
         encodeSendData(SOCKET, crowd,"b", temp, maskpos)
         if temp < 35:
@@ -242,7 +242,7 @@ def DDLoop(DDTuple,crowd,maskpos,SOCKET):
                 crowd = PeopleCounting(crowd, _consts, exit=0, enter=1)
         else:
             print("\nYour temperature is too high. Please go to a medical center!\n")
-        sleep(3)
+        sleep(1)
     return data,crowd
 
 if __name__ == '__main__':

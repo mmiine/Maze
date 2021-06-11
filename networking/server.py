@@ -21,7 +21,7 @@ def threaded_client(i,_connections):
 
 def server():
     host = 'localhost'  # get local machine name
-    port = 8053  # Make sure it's within the > 1024 $$ <65535 range
+    port = 8055  # Make sure it's within the > 1024 $$ <65535 range
     ThreadCount = 0
 
     s = socket.socket()
